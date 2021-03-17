@@ -15,3 +15,6 @@
 - Function that runs the next two functions.
 - Function that sends a text reminder to meditate.
 - Function that hits api endpoint which updates webapp meditation stats.
+- organize repo like snippetbox? ask others for common Go webapp organization
+- make nicer readme w/ phone screen record gif
+- 
