@@ -17,3 +17,5 @@
 # Exlude token & api key files
 .env
 *.json
+
+*.sum
