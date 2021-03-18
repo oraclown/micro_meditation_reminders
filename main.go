@@ -9,6 +9,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/jinzhu/now"
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
@@ -88,22 +89,32 @@ func main() {
 		log.Fatalf("Unable to retrieve Calendar client: %v", err)
 	}
 
-	t := time.Now().Format(time.RFC3339)
+	tMin := now.BeginningOfDay().Format(time.RFC3339)
+	tMax := now.EndOfDay().Format(time.RFC3339)
+
 	events, err := srv.Events.List("primary").ShowDeleted(false).
-		SingleEvents(true).TimeMin(t).MaxResults(10).OrderBy("startTime").Do()
+		SingleEvents(true).TimeMin(tMin).TimeMax(tMax).Do()
 	if err != nil {
 		log.Fatalf("Unable to retrieve next ten of the user's events: %v", err)
 	}
-	fmt.Println("Upcoming events:")
-	if len(events.Items) == 0 {
-		fmt.Println("No upcoming events found.")
-	} else {
-		for _, item := range events.Items {
-			date := item.Start.DateTime
-			if date == "" {
-				date = item.Start.Date
+
+	for _, item := range events.Items {
+		if item.Summary == "work" {
+			fmt.Println(item.Start.DateTime)
+			fmt.Println(item.End.DateTime)
+			t1, err := time.Parse(time.RFC3339, item.Start.DateTime)
+			if err != nil {
+				fmt.Println(err)
 			}
-			fmt.Printf("%v (%v)\n", item.Summary, date)
+			fmt.Println(t1)
+			t2, err := time.Parse(time.RFC3339, item.End.DateTime)
+			if err != nil {
+				fmt.Println(err)
+			}
+			fmt.Println(t2)
+
+			return
 		}
 	}
+
 }
