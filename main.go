@@ -71,7 +71,8 @@ func saveToken(path string, token *oauth2.Token) {
 	json.NewEncoder(f).Encode(token)
 }
 
-func main() {
+// Gets all events for the current day.
+func getTodayEvents() *calendar.Events {
 	b, err := ioutil.ReadFile("credentials.json")
 	if err != nil {
 		log.Fatalf("Unable to read client secret file: %v", err)
@@ -98,23 +99,44 @@ func main() {
 		log.Fatalf("Unable to retrieve next ten of the user's events: %v", err)
 	}
 
+	return events
+}
+
+// For storing start & end times of work events.
+type workEvent struct {
+	start time.Time
+	end   time.Time
+}
+
+// Gets all start & end times of events labeled "work".
+func getWorkEvents(events *calendar.Events) []workEvent {
+	workEvents := make([]workEvent, 0)
+
 	for _, item := range events.Items {
 		if item.Summary == "work" {
-			fmt.Println(item.Start.DateTime)
-			fmt.Println(item.End.DateTime)
-			t1, err := time.Parse(time.RFC3339, item.Start.DateTime)
-			if err != nil {
-				fmt.Println(err)
-			}
-			fmt.Println(t1)
-			t2, err := time.Parse(time.RFC3339, item.End.DateTime)
-			if err != nil {
-				fmt.Println(err)
-			}
-			fmt.Println(t2)
 
-			return
+			startTime, _ := time.Parse(time.RFC3339, item.Start.DateTime)
+			endTime, _ := time.Parse(time.RFC3339, item.End.DateTime)
+
+			aWorkEvent := workEvent{
+				start: startTime,
+				end:   endTime,
+			}
+
+			workEvents = append(workEvents, aWorkEvent)
+
 		}
 	}
 
+	return workEvents
+}
+
+func main() {
+	allEvents := getTodayEvents()
+	workEvents := getWorkEvents(allEvents)
+
+	for _, event := range workEvents {
+		fmt.Println(event.start)
+		fmt.Println(event.end)
+	}
 }
