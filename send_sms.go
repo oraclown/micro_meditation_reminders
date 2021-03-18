@@ -14,6 +14,7 @@ func loadEnvVars() {
 		fmt.Println("Error loading .env file")
 	}
 }
+
 func sendSMS() {
 	loadEnvVars()
 
