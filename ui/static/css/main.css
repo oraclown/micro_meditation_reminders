@@ -1,0 +1,10 @@
+body {
+    background: #99ccff;
+  }
+  .container {
+    display: flex;
+    justify-content: center;
+    color: white;
+    font-family: monospace;
+    font-size:110%;
+  }
