@@ -12,6 +12,7 @@ import (
 	"github.com/sfreiberg/gotwilio"
 )
 
+// Ready environment variables.
 func loadEnvVars() {
 	err := godotenv.Load()
 	if err != nil {
@@ -19,6 +20,7 @@ func loadEnvVars() {
 	}
 }
 
+// Send meditation reminder text using Twilio.
 func sendSMS() {
 	loadEnvVars()
 
@@ -33,16 +35,19 @@ func sendSMS() {
 	twilio.SendSMS(from, to, message, "", "")
 }
 
+// Send meditation reminder texts every 50th min from 9a-8p using cronjobs.
 func scheduleReminders() {
 	c := cron.New()
 
-	jobStr := "0 50 9-20 * * *"
-	c.AddFunc(jobStr, func() { sendSMS() })
-	c.AddFunc(jobStr, func() { fmt.Println("sending text") })
+	jobTime := "0 50 9-20 * * *"
+
+	c.AddFunc(jobTime, func() { sendSMS() })
+	c.AddFunc(jobTime, func() { fmt.Println("sending text") })
 
 	c.Start()
 }
 
+// Route for app homepage.
 func home(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
 		http.NotFound(w, r)
@@ -63,6 +68,7 @@ func home(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// Schedule reminder texts and serve a simple single page app.
 func main() {
 	go scheduleReminders()
 
